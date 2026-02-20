@@ -7,7 +7,7 @@ on:
 
 jobs:
   clean:
-    # 🔒 Evita loop infinito (no se ejecuta si el commit lo hizo el bot)
+    # 🔒 Evita loop infinito (no corre si el commit lo hace el bot)
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
@@ -32,7 +32,7 @@ jobs:
 
       - name: Process all Excel files
         run: |
-          shopt -s globstar
+          shopt -s globstar nullglob
           files=(data/**/*.xlsx)
 
           if [ ${#files[@]} -eq 0 ]; then
@@ -50,8 +50,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/**/*.xlsx
+          # Agrega todos los cambios dentro de data/
+          git add -A data
 
+          # Verifica si realmente hay cambios
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
